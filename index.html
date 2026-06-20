@@ -353,6 +353,25 @@ input:focus,select:focus,textarea:focus{
   .bulk-size-row{grid-template-columns:repeat(3,1fr)}
 }
 
+
+.size-check{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:6px;
+}
+.size-check input[type="checkbox"]{
+  width:auto;
+  transform:scale(1.15);
+}
+.size-check label{
+  font-size:13px;
+  color:var(--ink);
+}
+.bulk-size-row input[type="number"]{
+  padding:9px;
+}
+
 </style>
 </head>
 <body>
@@ -505,7 +524,7 @@ input:focus,select:focus,textarea:focus{
         <div><label>&nbsp;</label><button class="action secondary" onclick="addTempOrderItem()">Add One Size Only</button></div>
       </div>
       <div class="bulk-builder">
-        <h4>Enter one item, fill in all sizes needed, then add another different item if needed</h4>
+        <h4>Enter one item, check each size you need, enter quantity for each checked size, then add another different item if needed</h4>
         <div class="bulk-size-row" id="orderBulkSizes"></div>
         <div class="toolbar"><button class="action" onclick="addTempOrderBulkSizes()">Add This Item + All Sizes</button></div>
       </div>
@@ -542,7 +561,7 @@ input:focus,select:focus,textarea:focus{
         <div><label>&nbsp;</label><button class="action" onclick="addLineItem()">Add One Size Only</button></div>
       </div>
       <div class="bulk-builder">
-        <h4>Enter one invoice item, fill in all sizes needed, then add another different item if needed</h4>
+        <h4>Enter one invoice item, check each size you need, enter quantity for each checked size, then add another different item if needed</h4>
         <div class="bulk-size-row" id="invoiceBulkSizes"></div>
         <div class="toolbar"><button class="action" onclick="addInvoiceBulkSizes()">Add This Invoice Item + All Sizes</button></div>
       </div>
@@ -608,9 +627,31 @@ document.getElementById('nav').innerHTML=tabs.map((t,i)=>`<button onclick="showT
 document.getElementById('sizeGrid').innerHTML=sizes.map(s=>`<div class="size-box"><strong>${s}</strong><input id="size_${s}" type="number" min="0" placeholder="Qty"></div>`).join('');
 function fillBulkSizeGrids(){
   const order=document.getElementById('orderBulkSizes');
-  if(order)order.innerHTML=sizes.map(s=>`<div><b>${s}</b><input id="orderBulk_${s}" type="number" min="0" placeholder="0"></div>`).join('');
+  if(order)order.innerHTML=sizes.map(s=>`
+    <div>
+      <div class="size-check">
+        <input id="orderCheck_${s}" type="checkbox" onchange="toggleQty('order','${s}')">
+        <label for="orderCheck_${s}"><b>${s}</b></label>
+      </div>
+      <input id="orderBulk_${s}" type="number" min="0" placeholder="Qty" disabled>
+    </div>`).join('');
   const invoice=document.getElementById('invoiceBulkSizes');
-  if(invoice)invoice.innerHTML=sizes.map(s=>`<div><b>${s}</b><input id="invoiceBulk_${s}" type="number" min="0" placeholder="0"></div>`).join('');
+  if(invoice)invoice.innerHTML=sizes.map(s=>`
+    <div>
+      <div class="size-check">
+        <input id="invoiceCheck_${s}" type="checkbox" onchange="toggleQty('invoice','${s}')">
+        <label for="invoiceCheck_${s}"><b>${s}</b></label>
+      </div>
+      <input id="invoiceBulk_${s}" type="number" min="0" placeholder="Qty" disabled>
+    </div>`).join('');
+}
+function toggleQty(prefix,size){
+  const check=document.getElementById(prefix+'Check_'+size);
+  const qty=document.getElementById(prefix+'Bulk_'+size);
+  if(!check||!qty)return;
+  qty.disabled=!check.checked;
+  if(check.checked && !qty.value)qty.value=1;
+  if(!check.checked)qty.value='';
 }
 fillBulkSizeGrids();
 document.getElementById('iDate').valueAsDate=new Date();
@@ -662,15 +703,18 @@ function addTempOrderBulkSizes(){
   if(!base.item)return alert('Add an item name first.');
   let added=0;
   sizes.forEach(s=>{
+    const check=document.getElementById('orderCheck_'+s);
     const el=document.getElementById('orderBulk_'+s);
     const q=el?Number(el.value)||0:0;
-    if(q>0){
+    if(check && check.checked && q>0){
       tempOrderItems.push({...base,size:s,qty:q});
       el.value='';
+      el.disabled=true;
+      check.checked=false;
       added++;
     }
   });
-  if(!added)return alert('Enter quantity under at least one size.');
+  if(!added)return alert('Check at least one size and enter a quantity.');
   alert('Added '+added+' size line(s) for this item. Add another different item next, or save the whole order.');
   ['oiItem','oiColor','oiPrice','oiCost','oiDesign'].forEach(id=>set(id,''));
   set('oiQty',1);
@@ -719,7 +763,7 @@ function addOrder(){
   ['oNumber','oCustomer','oPhone','oEmail','oDue','oNotes','oiItem','oiColor','oiPrice','oiCost','oiDesign'].forEach(id=>set(id,''));
   set('oiQty',1);
   tempOrderItems=[];
-  sizes.forEach(s=>{const el=document.getElementById('orderBulk_'+s); if(el)el.value='';});
+  sizes.forEach(s=>{const el=document.getElementById('orderBulk_'+s); const ch=document.getElementById('orderCheck_'+s); if(el){el.value='';el.disabled=true;} if(ch)ch.checked=false;});
   renderTempOrderItems();
   save();
 }
@@ -815,22 +859,25 @@ function addInvoiceBulkSizes(){
   if(!base.desc)return alert('Add an item or description first.');
   let added=0;
   sizes.forEach(s=>{
+    const check=document.getElementById('invoiceCheck_'+s);
     const el=document.getElementById('invoiceBulk_'+s);
     const q=el?Number(el.value)||0:0;
-    if(q>0){
+    if(check && check.checked && q>0){
       db.invoice.lines.push({...base,size:s,qty:q});
       el.value='';
+      el.disabled=true;
+      check.checked=false;
       added++;
     }
   });
-  if(!added)return alert('Enter quantity under at least one size.');
+  if(!added)return alert('Check at least one size and enter a quantity.');
   alert('Added '+added+' size line(s) for this invoice item. Add another different item next, or print/save the invoice.');
   ['liDesc','liColor','liSize','liPrice'].forEach(id=>set(id,''));
   set('liQty',1);
   save();
   renderInvoice();
 }
-function clearInvoice(){db.invoice={lines:[]};['iNumber','iCustomer','iContact','iNotes'].forEach(id=>set(id,''));sizes.forEach(s=>{const el=document.getElementById('invoiceBulk_'+s); if(el)el.value='';});renderInvoice();}
+function clearInvoice(){db.invoice={lines:[]};['iNumber','iCustomer','iContact','iNotes'].forEach(id=>set(id,''));sizes.forEach(s=>{const el=document.getElementById('invoiceBulk_'+s); const ch=document.getElementById('invoiceCheck_'+s); if(el){el.value='';el.disabled=true;} if(ch)ch.checked=false;});renderInvoice();}
 function removeLine(i){db.invoice.lines.splice(i,1);save();renderInvoice();}
 function editInvoiceLine(i){
   const l=db.invoice.lines[i]; if(!l)return;
