@@ -497,19 +497,19 @@ input:focus,select:focus,textarea:focus{
       <div class="form-grid">
         <div><label>Item</label><input id="oiItem" placeholder="Hoodie, shirt, crewneck"></div>
         <div><label>Color</label><input id="oiColor"></div>
-        <div><label>Single Size</label><select id="oiSize"><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>2XL</option><option>3XL</option><option>4XL</option><option>5XL</option><option>Custom</option></select></div>
-        <div><label>Single Qty</label><input id="oiQty" type="number" value="1"></div>
+        <div><label>One Size</label><select id="oiSize"><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>2XL</option><option>3XL</option><option>4XL</option><option>5XL</option><option>Custom</option></select></div>
+        <div><label>One Qty</label><input id="oiQty" type="number" value="1"></div>
         <div><label>Unit Price</label><input id="oiPrice" type="number" step="0.01"></div>
         <div><label>Unit Cost</label><input id="oiCost" type="number" step="0.01"></div>
         <div><label>Design / Placement</label><input id="oiDesign" placeholder="Full front, small chest"></div>
-        <div><label>&nbsp;</label><button class="action secondary" onclick="addTempOrderItem()">Add Single Item</button></div>
+        <div><label>&nbsp;</label><button class="action secondary" onclick="addTempOrderItem()">Add One Size Only</button></div>
       </div>
       <div class="bulk-builder">
-        <h4>Add this item in multiple sizes, then add another different item if needed</h4>
+        <h4>Enter one item, fill in all sizes needed, then add another different item if needed</h4>
         <div class="bulk-size-row" id="orderBulkSizes"></div>
-        <div class="toolbar"><button class="action" onclick="addTempOrderBulkSizes()">Add This Item Group</button></div>
+        <div class="toolbar"><button class="action" onclick="addTempOrderBulkSizes()">Add This Item + All Sizes</button></div>
       </div>
-      <div class="notice">Current order items below. Add another item above before tapping Save Whole Order.</div><div class="table-wrap" style="margin-top:12px"><table style="min-width:700px"><thead><tr><th>Item</th><th>Color</th><th>Size</th><th>Qty</th><th>Unit Price</th><th>Unit Cost</th><th>Design</th><th></th></tr></thead><tbody id="tempOrderItems"></tbody></table></div>
+      <div class="notice">Current order items are listed below. One item can include many sizes. Add another different item above before tapping Save Whole Order.</div><div class="table-wrap" style="margin-top:12px"><table style="min-width:700px"><thead><tr><th>Item</th><th>Color</th><th>Size</th><th>Qty</th><th>Unit Price</th><th>Unit Cost</th><th>Design</th><th></th></tr></thead><tbody id="tempOrderItems"></tbody></table></div>
 
       <div style="margin-top:12px"><label>Notes / Artwork Info</label><textarea id="oNotes"></textarea></div>
       <div class="toolbar"><button class="action" onclick="addOrder()">Save Whole Order</button></div>
@@ -536,17 +536,17 @@ input:focus,select:focus,textarea:focus{
       <div class="form-grid">
         <div><label>Item / Description</label><input id="liDesc"></div>
         <div><label>Color</label><input id="liColor"></div>
-        <div><label>Single Size</label><input id="liSize"></div>
-        <div><label>Single Qty</label><input id="liQty" type="number" value="1"></div>
+        <div><label>One Size</label><input id="liSize"></div>
+        <div><label>One Qty</label><input id="liQty" type="number" value="1"></div>
         <div><label>Unit Price</label><input id="liPrice" type="number" step="0.01"></div>
-        <div><label>&nbsp;</label><button class="action" onclick="addLineItem()">Add Single Line</button></div>
+        <div><label>&nbsp;</label><button class="action" onclick="addLineItem()">Add One Size Only</button></div>
       </div>
       <div class="bulk-builder">
-        <h4>Add this invoice item in multiple sizes, then add another different item if needed</h4>
+        <h4>Enter one invoice item, fill in all sizes needed, then add another different item if needed</h4>
         <div class="bulk-size-row" id="invoiceBulkSizes"></div>
-        <div class="toolbar"><button class="action" onclick="addInvoiceBulkSizes()">Add This Invoice Group</button></div>
+        <div class="toolbar"><button class="action" onclick="addInvoiceBulkSizes()">Add This Invoice Item + All Sizes</button></div>
       </div>
-      <div class="notice">Current invoice items appear in the preview below. Add another item above anytime before printing.</div>
+      <div class="notice">Current invoice items appear in the preview below. One item can include many sizes. Add another different item above anytime before printing.</div>
       <div style="margin-top:12px"><label>Notes</label><textarea id="iNotes" oninput="renderInvoice()"></textarea></div>
       <div class="toolbar">
         <button class="action" onclick="window.print()">Print / Save PDF</button>
@@ -671,6 +671,7 @@ function addTempOrderBulkSizes(){
     }
   });
   if(!added)return alert('Enter quantity under at least one size.');
+  alert('Added '+added+' size line(s) for this item. Add another different item next, or save the whole order.');
   ['oiItem','oiColor','oiPrice','oiCost','oiDesign'].forEach(id=>set(id,''));
   set('oiQty',1);
   renderTempOrderItems();
@@ -766,12 +767,29 @@ function orderItems(o){
   if(Array.isArray(o.items))return o.items;
   return [{item:o.item||'',color:o.color||'',size:o.size||'',qty:o.qty||1,price:(o.price||0)/(o.qty||1),cost:(o.cost||0)/(o.qty||1),design:''}];
 }
+
+function groupItemLines(lines){
+  const groups = {};
+  (lines||[]).forEach(line=>{
+    const key=[line.item||line.desc||'',line.color||'',line.design||'',line.price||'',line.cost||''].join('||');
+    if(!groups[key]) groups[key]={...line, sizes:[], totalQty:0};
+    groups[key].sizes.push({size:line.size||'', qty:Number(line.qty)||0});
+    groups[key].totalQty += Number(line.qty)||0;
+  });
+  return Object.values(groups);
+}
+function groupedItemSummary(lines){
+  return groupItemLines(lines).map(g=>{
+    const sizes=g.sizes.map(s=>`<span class="pill">${esc(s.size)} x ${s.qty}</span>`).join(' ');
+    return `<div style="margin-bottom:8px"><b>${esc(g.item||g.desc)}</b> ${esc(g.color||'')} ${g.design?'<small>'+esc(g.design)+'</small>':''}<br>${sizes}</div>`;
+  }).join('');
+}
 function renderOrders(){
   const q=val('orderSearch');
   document.getElementById('orderRows').innerHTML=db.orders.filter(x=>match(x,q)).map(x=>{
     const items=orderItems(x);
     const totalQty=items.reduce((a,it)=>a+(Number(it.qty)||0),0);
-    const itemList='<div class="item-summary">'+items.map(it=>`<b>${esc(it.item)}</b> &nbsp; ${esc(it.color)} &nbsp; <span class="pill">${esc(it.size)} x ${it.qty}</span>${it.design?' <small>'+esc(it.design)+'</small>':''}`).join('<br>')+'</div>';
+    const itemList='<div class="item-summary">'+groupedItemSummary(items)+'</div>';
     const price=items.reduce((a,it)=>a+(it.qty||0)*(it.price||0),0) || x.price || 0;
     const cost=items.reduce((a,it)=>a+(it.qty||0)*(it.cost||0),0) || x.cost || 0;
     return `<tr><td><b>${esc(x.number)}</b><br><small>${items.length} line item${items.length===1?'':'s'}</small></td><td>${esc(x.customer)}<br><small>${esc(x.phone)} ${esc(x.email)}</small></td><td>${itemList}</td><td>${totalQty}</td><td><span class="pill">${esc(x.status)}</span></td><td>${esc(x.due)}</td><td>${money(price)}</td><td>${money(price-cost)}</td>
@@ -806,6 +824,7 @@ function addInvoiceBulkSizes(){
     }
   });
   if(!added)return alert('Enter quantity under at least one size.');
+  alert('Added '+added+' size line(s) for this invoice item. Add another different item next, or print/save the invoice.');
   ['liDesc','liColor','liSize','liPrice'].forEach(id=>set(id,''));
   set('liQty',1);
   save();
@@ -841,6 +860,7 @@ function renderInvoice(){
     </div>
     <p><b>Bill To:</b><br>${esc(val('iCustomer'))}<br>${esc(val('iContact'))}</p>
     <p><b>Invoice Items:</b> ${lines.length}</p>
+    <p><b>Grouped View:</b></p><div class="item-summary">${groupedItemSummary(lines)}</div>
     <table style="min-width:0"><thead><tr><th>Description</th><th>Color</th><th>Size</th><th>Qty</th><th>Unit</th><th>Total</th><th class="no-print"></th></tr></thead><tbody>
     ${lines.map((l,i)=>`<tr><td>${esc(l.desc)}${l.design?'<br><small>'+esc(l.design)+'</small>':''}</td><td>${esc(l.color)}</td><td>${esc(l.size)}</td><td>${l.qty}</td><td>${money(l.price)}</td><td>${money((l.qty||0)*(l.price||0))}</td><td class="no-print"><div class="row-actions"><button onclick="editInvoiceLine(${i})">Edit</button><button onclick="duplicateInvoiceLine(${i})">Duplicate</button><button onclick="removeLine(${i})">Remove</button></div></td></tr>`).join('')}
     </tbody></table>
