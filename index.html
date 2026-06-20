@@ -318,6 +318,41 @@ input:focus,select:focus,textarea:focus{
   .soft-title{display:block}
 }
 
+
+.bulk-builder{
+  background:#fffafd;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:12px;
+  margin-top:12px;
+}
+.bulk-builder h4{
+  margin:0 0 10px;
+  font-size:15px;
+}
+.bulk-size-row{
+  display:grid;
+  grid-template-columns:repeat(9,minmax(58px,1fr));
+  gap:8px;
+}
+.bulk-size-row div{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:8px;
+}
+.bulk-size-row b{
+  display:block;
+  font-size:12px;
+  margin-bottom:5px;
+}
+.item-summary{
+  line-height:1.55;
+}
+@media(max-width:900px){
+  .bulk-size-row{grid-template-columns:repeat(3,1fr)}
+}
+
 </style>
 </head>
 <body>
@@ -446,7 +481,7 @@ input:focus,select:focus,textarea:focus{
   </section>
 
   <section id="orders" class="section">
-    <div class="soft-title"><h2>Orders</h2><small>One order can have many items</small></div><div class="helper"><span class="step-tag">Next step</span>Add the customer first, then add each hoodie, shirt, size, color, and quantity as separate order lines.</div>
+    <div class="soft-title"><h2>Orders</h2><small>One order can have many items</small></div><div class="helper"><span class="step-tag">Next step</span>Add the customer once, then add as many different items as needed. Example: 2 black hoodies, 1 pink crewneck, and 4 white tees can all stay on the same order.</div>
     <div class="card form-card">
       <h3>Add Order</h3>
       <div class="form-grid">
@@ -458,18 +493,23 @@ input:focus,select:focus,textarea:focus{
         <div><label>Due Date</label><input id="oDue" type="date"></div>
       </div>
 
-      <h3 style="margin-top:16px">Order Items</h3>
+      <h3 style="margin-top:16px">Build This Order</h3>
       <div class="form-grid">
         <div><label>Item</label><input id="oiItem" placeholder="Hoodie, shirt, crewneck"></div>
         <div><label>Color</label><input id="oiColor"></div>
-        <div><label>Size</label><select id="oiSize"><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>2XL</option><option>3XL</option><option>4XL</option><option>5XL</option><option>Custom</option></select></div>
-        <div><label>Quantity</label><input id="oiQty" type="number" value="1"></div>
+        <div><label>Single Size</label><select id="oiSize"><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>2XL</option><option>3XL</option><option>4XL</option><option>5XL</option><option>Custom</option></select></div>
+        <div><label>Single Qty</label><input id="oiQty" type="number" value="1"></div>
         <div><label>Unit Price</label><input id="oiPrice" type="number" step="0.01"></div>
         <div><label>Unit Cost</label><input id="oiCost" type="number" step="0.01"></div>
         <div><label>Design / Placement</label><input id="oiDesign" placeholder="Full front, small chest"></div>
-        <div><label>&nbsp;</label><button class="action secondary" onclick="addTempOrderItem()">Add This Item</button></div>
+        <div><label>&nbsp;</label><button class="action secondary" onclick="addTempOrderItem()">Add Single Item</button></div>
       </div>
-      <div class="table-wrap" style="margin-top:12px"><table style="min-width:700px"><thead><tr><th>Item</th><th>Color</th><th>Size</th><th>Qty</th><th>Unit Price</th><th>Unit Cost</th><th>Design</th><th></th></tr></thead><tbody id="tempOrderItems"></tbody></table></div>
+      <div class="bulk-builder">
+        <h4>Add this item in multiple sizes, then add another different item if needed</h4>
+        <div class="bulk-size-row" id="orderBulkSizes"></div>
+        <div class="toolbar"><button class="action" onclick="addTempOrderBulkSizes()">Add This Item Group</button></div>
+      </div>
+      <div class="notice">Current order items below. Add another item above before tapping Save Whole Order.</div><div class="table-wrap" style="margin-top:12px"><table style="min-width:700px"><thead><tr><th>Item</th><th>Color</th><th>Size</th><th>Qty</th><th>Unit Price</th><th>Unit Cost</th><th>Design</th><th></th></tr></thead><tbody id="tempOrderItems"></tbody></table></div>
 
       <div style="margin-top:12px"><label>Notes / Artwork Info</label><textarea id="oNotes"></textarea></div>
       <div class="toolbar"><button class="action" onclick="addOrder()">Save Whole Order</button></div>
@@ -481,7 +521,7 @@ input:focus,select:focus,textarea:focus{
   </section>
 
   <section id="invoice" class="section">
-    <div class="soft-title"><h2>Invoice</h2><small>Retail or wholesale</small></div><div class="helper"><span class="step-tag">Next step</span>Create invoices from an order or add lines manually. Use wholesale to remove sales tax.</div>
+    <div class="soft-title"><h2>Invoice</h2><small>Retail or wholesale</small></div><div class="helper"><span class="step-tag">Next step</span>Add as many different invoice items as needed. Each item can have its own color, size, quantity, and price. Use wholesale to remove sales tax.</div>
     <div class="card form-card no-print">
       <h3>Create Invoice</h3>
       <div class="form-grid">
@@ -492,15 +532,21 @@ input:focus,select:focus,textarea:focus{
         <div><label>Invoice Type</label><select id="iWholesale" onchange="renderInvoice()"><option value="retail">Retail - include tax</option><option value="wholesale">Wholesale - no sales tax</option></select></div>
         <div><label>Sales Tax %</label><input id="iTax" type="number" step="0.01" value="8.75" oninput="renderInvoice()"></div>
       </div>
-      <h3 style="margin-top:16px">Line Item</h3>
+      <h3 style="margin-top:16px">Build This Invoice</h3>
       <div class="form-grid">
         <div><label>Item / Description</label><input id="liDesc"></div>
         <div><label>Color</label><input id="liColor"></div>
-        <div><label>Size</label><input id="liSize"></div>
-        <div><label>Quantity</label><input id="liQty" type="number" value="1"></div>
+        <div><label>Single Size</label><input id="liSize"></div>
+        <div><label>Single Qty</label><input id="liQty" type="number" value="1"></div>
         <div><label>Unit Price</label><input id="liPrice" type="number" step="0.01"></div>
-        <div><label>&nbsp;</label><button class="action" onclick="addLineItem()">Add Invoice Line</button></div>
+        <div><label>&nbsp;</label><button class="action" onclick="addLineItem()">Add Single Line</button></div>
       </div>
+      <div class="bulk-builder">
+        <h4>Add this invoice item in multiple sizes, then add another different item if needed</h4>
+        <div class="bulk-size-row" id="invoiceBulkSizes"></div>
+        <div class="toolbar"><button class="action" onclick="addInvoiceBulkSizes()">Add This Invoice Group</button></div>
+      </div>
+      <div class="notice">Current invoice items appear in the preview below. Add another item above anytime before printing.</div>
       <div style="margin-top:12px"><label>Notes</label><textarea id="iNotes" oninput="renderInvoice()"></textarea></div>
       <div class="toolbar">
         <button class="action" onclick="window.print()">Print / Save PDF</button>
@@ -560,6 +606,13 @@ function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&l
 
 document.getElementById('nav').innerHTML=tabs.map((t,i)=>`<button onclick="showTab('${t[0]}')" class="${i===0?'active':''}">${t[1]}</button>`).join('');
 document.getElementById('sizeGrid').innerHTML=sizes.map(s=>`<div class="size-box"><strong>${s}</strong><input id="size_${s}" type="number" min="0" placeholder="Qty"></div>`).join('');
+function fillBulkSizeGrids(){
+  const order=document.getElementById('orderBulkSizes');
+  if(order)order.innerHTML=sizes.map(s=>`<div><b>${s}</b><input id="orderBulk_${s}" type="number" min="0" placeholder="0"></div>`).join('');
+  const invoice=document.getElementById('invoiceBulkSizes');
+  if(invoice)invoice.innerHTML=sizes.map(s=>`<div><b>${s}</b><input id="invoiceBulk_${s}" type="number" min="0" placeholder="0"></div>`).join('');
+}
+fillBulkSizeGrids();
 document.getElementById('iDate').valueAsDate=new Date();
 
 function showTab(id){
@@ -604,15 +657,54 @@ function addTempOrderItem(){
   set('oiQty',1);
   renderTempOrderItems();
 }
+function addTempOrderBulkSizes(){
+  const base={item:val('oiItem'),color:val('oiColor'),price:num('oiPrice'),cost:num('oiCost'),design:val('oiDesign')};
+  if(!base.item)return alert('Add an item name first.');
+  let added=0;
+  sizes.forEach(s=>{
+    const el=document.getElementById('orderBulk_'+s);
+    const q=el?Number(el.value)||0:0;
+    if(q>0){
+      tempOrderItems.push({...base,size:s,qty:q});
+      el.value='';
+      added++;
+    }
+  });
+  if(!added)return alert('Enter quantity under at least one size.');
+  ['oiItem','oiColor','oiPrice','oiCost','oiDesign'].forEach(id=>set(id,''));
+  set('oiQty',1);
+  renderTempOrderItems();
+}
 function removeTempOrderItem(i){
   tempOrderItems.splice(i,1);
+  renderTempOrderItems();
+}
+function editTempOrderItem(i){
+  const x=tempOrderItems[i]; if(!x)return;
+  const item=prompt('Item',x.item); if(item===null)return;
+  const color=prompt('Color',x.color); if(color===null)return;
+  const size=prompt('Size',x.size); if(size===null)return;
+  const qty=prompt('Quantity',x.qty); if(qty===null)return;
+  const price=prompt('Unit Price',x.price); if(price===null)return;
+  const cost=prompt('Unit Cost',x.cost); if(cost===null)return;
+  const design=prompt('Design / Placement',x.design||''); if(design===null)return;
+  tempOrderItems[i]={item,color,size,qty:Number(qty)||0,price:Number(price)||0,cost:Number(cost)||0,design};
+  renderTempOrderItems();
+}
+function duplicateTempOrderItem(i){
+  const x=tempOrderItems[i]; if(!x)return;
+  tempOrderItems.push({...x});
   renderTempOrderItems();
 }
 function renderTempOrderItems(){
   const el=document.getElementById('tempOrderItems');
   if(!el)return;
+  if(tempOrderItems.length===0){
+    el.innerHTML='<tr><td colspan="8">No items added yet. Add one item or a size group above.</td></tr>';
+    return;
+  }
   el.innerHTML=tempOrderItems.map((x,i)=>`
-    <tr><td>${esc(x.item)}</td><td>${esc(x.color)}</td><td>${esc(x.size)}</td><td>${x.qty}</td><td>${money(x.price)}</td><td>${money(x.cost)}</td><td>${esc(x.design)}</td><td><button onclick="removeTempOrderItem(${i})">Remove</button></td></tr>`).join('');
+    <tr><td>${esc(x.item)}</td><td>${esc(x.color)}</td><td>${esc(x.size)}</td><td>${x.qty}</td><td>${money(x.price)}</td><td>${money(x.cost)}</td><td>${esc(x.design)}</td><td><div class="row-actions"><button onclick="editTempOrderItem(${i})">Edit</button><button onclick="duplicateTempOrderItem(${i})">Duplicate</button><button onclick="removeTempOrderItem(${i})">Remove</button></div></td></tr>`).join('');
 }
 function addOrder(){
   if(tempOrderItems.length===0){
@@ -626,6 +718,7 @@ function addOrder(){
   ['oNumber','oCustomer','oPhone','oEmail','oDue','oNotes','oiItem','oiColor','oiPrice','oiCost','oiDesign'].forEach(id=>set(id,''));
   set('oiQty',1);
   tempOrderItems=[];
+  sizes.forEach(s=>{const el=document.getElementById('orderBulk_'+s); if(el)el.value='';});
   renderTempOrderItems();
   save();
 }
@@ -678,10 +771,10 @@ function renderOrders(){
   document.getElementById('orderRows').innerHTML=db.orders.filter(x=>match(x,q)).map(x=>{
     const items=orderItems(x);
     const totalQty=items.reduce((a,it)=>a+(Number(it.qty)||0),0);
-    const itemList=items.map(it=>`${esc(it.item)} - ${esc(it.color)} - ${esc(it.size)} x ${it.qty}${it.design?' ('+esc(it.design)+')':''}`).join('<br>');
+    const itemList='<div class="item-summary">'+items.map(it=>`<b>${esc(it.item)}</b> &nbsp; ${esc(it.color)} &nbsp; <span class="pill">${esc(it.size)} x ${it.qty}</span>${it.design?' <small>'+esc(it.design)+'</small>':''}`).join('<br>')+'</div>';
     const price=items.reduce((a,it)=>a+(it.qty||0)*(it.price||0),0) || x.price || 0;
     const cost=items.reduce((a,it)=>a+(it.qty||0)*(it.cost||0),0) || x.cost || 0;
-    return `<tr><td><b>${esc(x.number)}</b></td><td>${esc(x.customer)}<br><small>${esc(x.phone)} ${esc(x.email)}</small></td><td>${itemList}</td><td>${totalQty}</td><td><span class="pill">${esc(x.status)}</span></td><td>${esc(x.due)}</td><td>${money(price)}</td><td>${money(price-cost)}</td>
+    return `<tr><td><b>${esc(x.number)}</b><br><small>${items.length} line item${items.length===1?'':'s'}</small></td><td>${esc(x.customer)}<br><small>${esc(x.phone)} ${esc(x.email)}</small></td><td>${itemList}</td><td>${totalQty}</td><td><span class="pill">${esc(x.status)}</span></td><td>${esc(x.due)}</td><td>${money(price)}</td><td>${money(price-cost)}</td>
     <td><div class="row-actions"><button onclick="editItem('orders','${x.id}')">Edit</button><button onclick="makeInvoiceFromOrder('${x.id}')">Invoice</button><button onclick="delItem('orders','${x.id}')">Delete</button></div></td></tr>`;
   }).join('');
 }
@@ -698,8 +791,43 @@ function addLineItem(){
   ['liDesc','liColor','liSize','liPrice'].forEach(id=>set(id,''));
   set('liQty',1);save();renderInvoice();
 }
-function clearInvoice(){db.invoice={lines:[]};['iNumber','iCustomer','iContact','iNotes'].forEach(id=>set(id,''));renderInvoice();}
+function addInvoiceBulkSizes(){
+  if(!db.invoice)db.invoice={lines:[]};
+  const base={desc:val('liDesc'),color:val('liColor'),price:num('liPrice')};
+  if(!base.desc)return alert('Add an item or description first.');
+  let added=0;
+  sizes.forEach(s=>{
+    const el=document.getElementById('invoiceBulk_'+s);
+    const q=el?Number(el.value)||0:0;
+    if(q>0){
+      db.invoice.lines.push({...base,size:s,qty:q});
+      el.value='';
+      added++;
+    }
+  });
+  if(!added)return alert('Enter quantity under at least one size.');
+  ['liDesc','liColor','liSize','liPrice'].forEach(id=>set(id,''));
+  set('liQty',1);
+  save();
+  renderInvoice();
+}
+function clearInvoice(){db.invoice={lines:[]};['iNumber','iCustomer','iContact','iNotes'].forEach(id=>set(id,''));sizes.forEach(s=>{const el=document.getElementById('invoiceBulk_'+s); if(el)el.value='';});renderInvoice();}
 function removeLine(i){db.invoice.lines.splice(i,1);save();renderInvoice();}
+function editInvoiceLine(i){
+  const l=db.invoice.lines[i]; if(!l)return;
+  const desc=prompt('Item / Description',l.desc); if(desc===null)return;
+  const color=prompt('Color',l.color||''); if(color===null)return;
+  const size=prompt('Size',l.size||''); if(size===null)return;
+  const qty=prompt('Quantity',l.qty); if(qty===null)return;
+  const price=prompt('Unit Price',l.price); if(price===null)return;
+  db.invoice.lines[i]={...l,desc,color,size,qty:Number(qty)||0,price:Number(price)||0};
+  save();renderInvoice();
+}
+function duplicateInvoiceLine(i){
+  const l=db.invoice.lines[i]; if(!l)return;
+  db.invoice.lines.push({...l});
+  save();renderInvoice();
+}
 function renderInvoice(){
   const lines=(db.invoice&&db.invoice.lines)||[];
   const subtotal=lines.reduce((a,l)=>a+(Number(l.qty)||0)*(Number(l.price)||0),0);
@@ -712,8 +840,9 @@ function renderInvoice(){
       <div><b>Invoice #:</b> ${esc(val('iNumber'))}<br><b>Date:</b> ${esc(val('iDate'))}<br><b>Type:</b> ${wholesale?'Wholesale':'Retail'}</div>
     </div>
     <p><b>Bill To:</b><br>${esc(val('iCustomer'))}<br>${esc(val('iContact'))}</p>
+    <p><b>Invoice Items:</b> ${lines.length}</p>
     <table style="min-width:0"><thead><tr><th>Description</th><th>Color</th><th>Size</th><th>Qty</th><th>Unit</th><th>Total</th><th class="no-print"></th></tr></thead><tbody>
-    ${lines.map((l,i)=>`<tr><td>${esc(l.desc)}${l.design?'<br><small>'+esc(l.design)+'</small>':''}</td><td>${esc(l.color)}</td><td>${esc(l.size)}</td><td>${l.qty}</td><td>${money(l.price)}</td><td>${money((l.qty||0)*(l.price||0))}</td><td class="no-print"><button onclick="removeLine(${i})">Remove</button></td></tr>`).join('')}
+    ${lines.map((l,i)=>`<tr><td>${esc(l.desc)}${l.design?'<br><small>'+esc(l.design)+'</small>':''}</td><td>${esc(l.color)}</td><td>${esc(l.size)}</td><td>${l.qty}</td><td>${money(l.price)}</td><td>${money((l.qty||0)*(l.price||0))}</td><td class="no-print"><div class="row-actions"><button onclick="editInvoiceLine(${i})">Edit</button><button onclick="duplicateInvoiceLine(${i})">Duplicate</button><button onclick="removeLine(${i})">Remove</button></div></td></tr>`).join('')}
     </tbody></table>
     <div style="max-width:320px;margin-left:auto;margin-top:14px">
       <p><b>Subtotal:</b> ${money(subtotal)}</p>
