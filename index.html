@@ -220,19 +220,130 @@ tr:hover td{background:#fffafd}
   background:white;
 }
 .label strong{font-size:18px}
+
+.focus-strip{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+  margin:0 0 16px;
+}
+.focus-card{
+  background:linear-gradient(135deg,#ffffff,#fff0f7);
+  border:2px solid #ffd3e5;
+  border-radius:24px;
+  padding:14px;
+  box-shadow:0 8px 20px rgba(31,41,51,.08);
+}
+.focus-card b{display:block;font-size:16px;margin-bottom:4px}
+.focus-card span{font-size:13px;color:var(--muted)}
+.helper{
+  background:#f0fbff;
+  border:1px solid #ccefff;
+  border-radius:18px;
+  padding:12px 14px;
+  margin:8px 0 14px;
+  color:#315b66;
+  font-weight:700;
+}
+.soft-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.soft-title small{
+  color:var(--muted);
+  font-weight:700;
+  background:white;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:7px 10px;
+}
+.big-choice{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  margin-bottom:14px;
+}
+.big-choice button{
+  min-height:80px;
+  border:2px solid #ffd3e5;
+  border-radius:22px;
+  background:white;
+  font-weight:900;
+  font-size:15px;
+  cursor:pointer;
+  box-shadow:0 8px 18px rgba(31,41,51,.08);
+}
+.big-choice button:hover{background:#fff0f7}
+.progress{
+  height:12px;
+  background:#f2f4f7;
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:10px;
+}
+.progress i{
+  display:block;
+  height:100%;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border-radius:999px;
+}
+.encourage{
+  background:linear-gradient(135deg,#fff9df,#fff0f7);
+  border:1px solid #ffe6a6;
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:14px;
+  font-weight:800;
+}
+.step-tag{
+  display:inline-block;
+  background:#1f2933;
+  color:white;
+  border-radius:999px;
+  padding:5px 9px;
+  font-size:12px;
+  margin-right:6px;
+}
+input:focus,select:focus,textarea:focus{
+  outline:3px solid #bdefff;
+  border-color:#7bdff2;
+}
+@media(max-width:900px){
+  .focus-strip,.big-choice{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  .focus-strip,.big-choice{grid-template-columns:1fr}
+  .soft-title{display:block}
+}
+
 </style>
 </head>
 <body>
 <header>
   <h1>Redwood Coast Design Inventory Studio</h1>
-  <p>Inventory, orders, invoices, labels, reports, and backups</p>
+  <p>Simple steps, clear lists, cheerful progress, and everything saved in one place</p>
 </header>
 
 <main>
   <div class="nav no-print" id="nav"></div>
 
   <section id="dashboard" class="section active">
-    <h2>Dashboard</h2>
+    <div class="soft-title"><h2>Today’s Focus</h2><small>Pick one thing and keep moving</small></div>
+    <div class="encourage">You do not have to organize everything at once. Start with the next order, the next hoodie, or the next low-stock item.</div>
+    <div class="focus-strip">
+      <div class="focus-card"><b>1. Add what came in</b><span>Log garments, DTF, or HTV before it disappears into a bin.</span></div>
+      <div class="focus-card"><b>2. Check what is low</b><span>Use the alerts before you start taking new orders.</span></div>
+      <div class="focus-card"><b>3. Print what is due</b><span>Open Orders, make labels, and press one batch at a time.</span></div>
+    </div>
+    <div class="big-choice no-print">
+      <button onclick="showTab('garments')">Add Garments</button>
+      <button onclick="showTab('orders')">Save Whole Order</button>
+      <button onclick="showTab('labels')">Print Labels</button>
+      <button onclick="showTab('invoice')">Make Invoice</button>
+    </div>
+    <h2>Quick Snapshot</h2>
     <div class="grid">
       <div class="card stat"><span>Garments on hand</span><strong id="statGarments">0</strong><small>Total pieces</small></div>
       <div class="card stat"><span>DTF transfers</span><strong id="statDtf">0</strong><small>Total transfers</small></div>
@@ -262,7 +373,7 @@ tr:hover td{background:#fffafd}
   </section>
 
   <section id="garments" class="section">
-    <h2>Garment Inventory</h2>
+    <div class="soft-title"><h2>Garment Inventory</h2><small>Group by style, color, then sizes</small></div><div class="helper"><span class="step-tag">Next step</span>Add one style at a time, then fill in the quantities for every size you have.</div>
     <div class="card form-card">
       <h3>Add Garment Size Run</h3>
       <div class="form-grid">
@@ -278,7 +389,7 @@ tr:hover td{background:#fffafd}
       <div style="margin-top:12px"><label>Notes</label><textarea id="gNotes"></textarea></div>
       <h3 style="margin-top:16px">Sizes</h3>
       <div class="size-grid" id="sizeGrid"></div>
-      <div class="toolbar"><button class="action" onclick="addGarmentRun()">Add Size Run</button></div>
+      <div class="toolbar"><button class="action" onclick="addGarmentRun()">Save Garment Sizes</button></div>
     </div>
     <div class="card">
       <div class="searchbar"><input id="garmentSearch" placeholder="Search garments..." oninput="renderAll()"><button class="action secondary" onclick="printSection('garments')">Print</button></div>
@@ -287,7 +398,7 @@ tr:hover td{background:#fffafd}
   </section>
 
   <section id="dtf" class="section">
-    <h2>DTF Transfer Inventory</h2>
+    <div class="soft-title"><h2>DTF Transfer Inventory</h2><small>Designs, sizes, and placements</small></div><div class="helper"><span class="step-tag">Next step</span>Log the design name first, then size and placement. Keep it simple and searchable.</div>
     <div class="card form-card">
       <h3>Add DTF Transfer</h3>
       <div class="form-grid">
@@ -303,7 +414,7 @@ tr:hover td{background:#fffafd}
         <div><label>Barcode / SKU</label><input id="dBarcode"></div>
       </div>
       <div style="margin-top:12px"><label>Notes</label><textarea id="dNotes"></textarea></div>
-      <div class="toolbar"><button class="action" onclick="addDtf()">Add Transfer</button></div>
+      <div class="toolbar"><button class="action" onclick="addDtf()">Save Transfer</button></div>
     </div>
     <div class="card">
       <div class="searchbar"><input id="dtfSearch" placeholder="Search transfers..." oninput="renderAll()"><button class="action secondary" onclick="printSection('dtf')">Print</button></div>
@@ -312,7 +423,7 @@ tr:hover td{background:#fffafd}
   </section>
 
   <section id="htv" class="section">
-    <h2>HTV Inventory</h2>
+    <div class="soft-title"><h2>HTV Inventory</h2><small>Yards remaining by color</small></div><div class="helper"><span class="step-tag">Next step</span>Enter type, color, and yards left. Low-yard alerts will help you reorder before a rush job.</div>
     <div class="card form-card">
       <h3>Add HTV</h3>
       <div class="form-grid">
@@ -326,7 +437,7 @@ tr:hover td{background:#fffafd}
         <div><label>Barcode / SKU</label><input id="hBarcode"></div>
       </div>
       <div style="margin-top:12px"><label>Notes</label><textarea id="hNotes"></textarea></div>
-      <div class="toolbar"><button class="action" onclick="addHtv()">Add HTV</button></div>
+      <div class="toolbar"><button class="action" onclick="addHtv()">Save HTV</button></div>
     </div>
     <div class="card">
       <div class="searchbar"><input id="htvSearch" placeholder="Search HTV..." oninput="renderAll()"><button class="action secondary" onclick="printSection('htv')">Print</button></div>
@@ -335,7 +446,7 @@ tr:hover td{background:#fffafd}
   </section>
 
   <section id="orders" class="section">
-    <h2>Orders</h2>
+    <div class="soft-title"><h2>Orders</h2><small>One order can have many items</small></div><div class="helper"><span class="step-tag">Next step</span>Add the customer first, then add each hoodie, shirt, size, color, and quantity as separate order lines.</div>
     <div class="card form-card">
       <h3>Add Order</h3>
       <div class="form-grid">
@@ -343,26 +454,34 @@ tr:hover td{background:#fffafd}
         <div><label>Customer / Team</label><input id="oCustomer"></div>
         <div><label>Phone</label><input id="oPhone"></div>
         <div><label>Email</label><input id="oEmail"></div>
-        <div><label>Item / Job</label><input id="oItem" placeholder="Hoodie, team order, etc."></div>
-        <div><label>Color</label><input id="oColor"></div>
-        <div><label>Size</label><input id="oSize"></div>
-        <div><label>Quantity</label><input id="oQty" type="number" value="1"></div>
         <div><label>Status</label><select id="oStatus"><option>Waiting for Garments</option><option>Waiting for Transfers</option><option>Waiting for HTV</option><option>Ready to Press</option><option>Pressed / Complete</option><option>Picked Up</option></select></div>
         <div><label>Due Date</label><input id="oDue" type="date"></div>
-        <div><label>Price</label><input id="oPrice" type="number" step="0.01"></div>
-        <div><label>Cost</label><input id="oCost" type="number" step="0.01"></div>
       </div>
+
+      <h3 style="margin-top:16px">Order Items</h3>
+      <div class="form-grid">
+        <div><label>Item</label><input id="oiItem" placeholder="Hoodie, shirt, crewneck"></div>
+        <div><label>Color</label><input id="oiColor"></div>
+        <div><label>Size</label><select id="oiSize"><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>2XL</option><option>3XL</option><option>4XL</option><option>5XL</option><option>Custom</option></select></div>
+        <div><label>Quantity</label><input id="oiQty" type="number" value="1"></div>
+        <div><label>Unit Price</label><input id="oiPrice" type="number" step="0.01"></div>
+        <div><label>Unit Cost</label><input id="oiCost" type="number" step="0.01"></div>
+        <div><label>Design / Placement</label><input id="oiDesign" placeholder="Full front, small chest"></div>
+        <div><label>&nbsp;</label><button class="action secondary" onclick="addTempOrderItem()">Add This Item</button></div>
+      </div>
+      <div class="table-wrap" style="margin-top:12px"><table style="min-width:700px"><thead><tr><th>Item</th><th>Color</th><th>Size</th><th>Qty</th><th>Unit Price</th><th>Unit Cost</th><th>Design</th><th></th></tr></thead><tbody id="tempOrderItems"></tbody></table></div>
+
       <div style="margin-top:12px"><label>Notes / Artwork Info</label><textarea id="oNotes"></textarea></div>
-      <div class="toolbar"><button class="action" onclick="addOrder()">Add Order</button></div>
+      <div class="toolbar"><button class="action" onclick="addOrder()">Save Whole Order</button></div>
     </div>
     <div class="card">
       <div class="searchbar"><input id="orderSearch" placeholder="Search orders..." oninput="renderAll()"><button class="action secondary" onclick="printSection('orders')">Print</button></div>
-      <div class="table-wrap"><table><thead><tr><th>Order #</th><th>Customer</th><th>Item</th><th>Color</th><th>Size</th><th>Qty</th><th>Status</th><th>Due</th><th>Price</th><th>Profit</th><th>Actions</th></tr></thead><tbody id="orderRows"></tbody></table></div>
+      <div class="table-wrap"><table><thead><tr><th>Order #</th><th>Customer</th><th>Items</th><th>Total Qty</th><th>Status</th><th>Due</th><th>Total Price</th><th>Profit</th><th>Actions</th></tr></thead><tbody id="orderRows"></tbody></table></div>
     </div>
   </section>
 
   <section id="invoice" class="section">
-    <h2>Invoice</h2>
+    <div class="soft-title"><h2>Invoice</h2><small>Retail or wholesale</small></div><div class="helper"><span class="step-tag">Next step</span>Create invoices from an order or add lines manually. Use wholesale to remove sales tax.</div>
     <div class="card form-card no-print">
       <h3>Create Invoice</h3>
       <div class="form-grid">
@@ -375,10 +494,12 @@ tr:hover td{background:#fffafd}
       </div>
       <h3 style="margin-top:16px">Line Item</h3>
       <div class="form-grid">
-        <div><label>Description</label><input id="liDesc"></div>
+        <div><label>Item / Description</label><input id="liDesc"></div>
+        <div><label>Color</label><input id="liColor"></div>
+        <div><label>Size</label><input id="liSize"></div>
         <div><label>Quantity</label><input id="liQty" type="number" value="1"></div>
         <div><label>Unit Price</label><input id="liPrice" type="number" step="0.01"></div>
-        <div><label>&nbsp;</label><button class="action" onclick="addLineItem()">Add Line</button></div>
+        <div><label>&nbsp;</label><button class="action" onclick="addLineItem()">Add Invoice Line</button></div>
       </div>
       <div style="margin-top:12px"><label>Notes</label><textarea id="iNotes" oninput="renderInvoice()"></textarea></div>
       <div class="toolbar">
@@ -392,7 +513,7 @@ tr:hover td{background:#fffafd}
   </section>
 
   <section id="labels" class="section">
-    <h2>Labels</h2>
+    <div class="soft-title"><h2>Labels</h2><small>Order labels plus individual garment labels</small></div><div class="helper"><span class="step-tag">Next step</span>Choose an order, print one full order label, then individual labels for each item.</div>
     <div class="card form-card no-print">
       <h3>Print Order Labels</h3>
       <div class="form-grid">
@@ -407,7 +528,7 @@ tr:hover td{background:#fffafd}
   </section>
 
   <section id="reports" class="section">
-    <h2>Reports</h2>
+    <div class="soft-title"><h2>Reports</h2><small>Simple numbers, no digging</small></div><div class="helper"><span class="step-tag">Next step</span>Use this page when you need low stock, value, sales, or best-selling items at a glance.</div>
     <div class="grid">
       <div class="card stat"><span>Garment Value</span><strong id="repGarmentValue">$0</strong></div>
       <div class="card stat"><span>DTF Value</span><strong id="repDtfValue">$0</strong></div>
@@ -427,6 +548,7 @@ const tabs=[
 ];
 const sizes=['XS','S','M','L','XL','2XL','3XL','4XL','5XL'];
 let db=JSON.parse(localStorage.getItem('rcdStudio')||'{"garments":[],"dtf":[],"htv":[],"orders":[],"invoice":{"lines":[]}}');
+let tempOrderItems=[];
 
 function save(){localStorage.setItem('rcdStudio',JSON.stringify(db));renderAll();}
 function money(n){return '$'+(Number(n)||0).toFixed(2);}
@@ -474,10 +596,38 @@ function addHtv(){
   ['hColor','hWidth','hYards','hSupplier','hLocation','hBarcode','hNotes'].forEach(id=>set(id,''));
   set('hReorder',1);save();
 }
+function addTempOrderItem(){
+  const item={item:val('oiItem'),color:val('oiColor'),size:val('oiSize'),qty:num('oiQty'),price:num('oiPrice'),cost:num('oiCost'),design:val('oiDesign')};
+  if(!item.item || !item.qty){return alert('Add an item name and quantity.');}
+  tempOrderItems.push(item);
+  ['oiItem','oiColor','oiPrice','oiCost','oiDesign'].forEach(id=>set(id,''));
+  set('oiQty',1);
+  renderTempOrderItems();
+}
+function removeTempOrderItem(i){
+  tempOrderItems.splice(i,1);
+  renderTempOrderItems();
+}
+function renderTempOrderItems(){
+  const el=document.getElementById('tempOrderItems');
+  if(!el)return;
+  el.innerHTML=tempOrderItems.map((x,i)=>`
+    <tr><td>${esc(x.item)}</td><td>${esc(x.color)}</td><td>${esc(x.size)}</td><td>${x.qty}</td><td>${money(x.price)}</td><td>${money(x.cost)}</td><td>${esc(x.design)}</td><td><button onclick="removeTempOrderItem(${i})">Remove</button></td></tr>`).join('');
+}
 function addOrder(){
-  db.orders.push({id:uid(),number:val('oNumber')||('RCD-'+(db.orders.length+1).toString().padStart(4,'0')),customer:val('oCustomer'),phone:val('oPhone'),email:val('oEmail'),item:val('oItem'),color:val('oColor'),size:val('oSize'),qty:num('oQty'),status:val('oStatus'),due:val('oDue'),price:num('oPrice'),cost:num('oCost'),notes:val('oNotes')});
-  ['oNumber','oCustomer','oPhone','oEmail','oItem','oColor','oSize','oDue','oPrice','oCost','oNotes'].forEach(id=>set(id,''));
-  set('oQty',1);save();
+  if(tempOrderItems.length===0){
+    const quickItem=val('oiItem');
+    if(quickItem){addTempOrderItem();}
+  }
+  if(tempOrderItems.length===0)return alert('Add at least one order item.');
+  const totalPrice=tempOrderItems.reduce((a,x)=>a+(x.qty||0)*(x.price||0),0);
+  const totalCost=tempOrderItems.reduce((a,x)=>a+(x.qty||0)*(x.cost||0),0);
+  db.orders.push({id:uid(),number:val('oNumber')||('RCD-'+(db.orders.length+1).toString().padStart(4,'0')),customer:val('oCustomer'),phone:val('oPhone'),email:val('oEmail'),items:[...tempOrderItems],status:val('oStatus'),due:val('oDue'),price:totalPrice,cost:totalCost,notes:val('oNotes')});
+  ['oNumber','oCustomer','oPhone','oEmail','oDue','oNotes','oiItem','oiColor','oiPrice','oiCost','oiDesign'].forEach(id=>set(id,''));
+  set('oiQty',1);
+  tempOrderItems=[];
+  renderTempOrderItems();
+  save();
 }
 
 function dec(type,id,field='qty'){
@@ -519,23 +669,34 @@ function renderHtv(){
     <tr><td>${esc(x.type)}</td><td>${esc(x.color)}</td><td>${esc(x.width)}</td><td>${x.yards}</td><td>${esc(x.supplier)}</td><td>${esc(x.location)}</td><td>${esc(x.barcode)}</td><td>${rowStatus(x.yards,x.reorder)}</td>
     <td><div class="row-actions"><button onclick="dec('htv','${x.id}','yards')">-1 yd</button><button onclick="editItem('htv','${x.id}')">Edit</button><button onclick="delItem('htv','${x.id}')">Delete</button></div></td></tr>`).join('');
 }
+function orderItems(o){
+  if(Array.isArray(o.items))return o.items;
+  return [{item:o.item||'',color:o.color||'',size:o.size||'',qty:o.qty||1,price:(o.price||0)/(o.qty||1),cost:(o.cost||0)/(o.qty||1),design:''}];
+}
 function renderOrders(){
   const q=val('orderSearch');
-  document.getElementById('orderRows').innerHTML=db.orders.filter(x=>match(x,q)).map(x=>`
-    <tr><td><b>${esc(x.number)}</b></td><td>${esc(x.customer)}<br><small>${esc(x.phone)} ${esc(x.email)}</small></td><td>${esc(x.item)}</td><td>${esc(x.color)}</td><td>${esc(x.size)}</td><td>${x.qty}</td><td><span class="pill">${esc(x.status)}</span></td><td>${esc(x.due)}</td><td>${money(x.price)}</td><td>${money((x.price||0)-(x.cost||0))}</td>
-    <td><div class="row-actions"><button onclick="editItem('orders','${x.id}')">Edit</button><button onclick="makeInvoiceFromOrder('${x.id}')">Invoice</button><button onclick="delItem('orders','${x.id}')">Delete</button></div></td></tr>`).join('');
+  document.getElementById('orderRows').innerHTML=db.orders.filter(x=>match(x,q)).map(x=>{
+    const items=orderItems(x);
+    const totalQty=items.reduce((a,it)=>a+(Number(it.qty)||0),0);
+    const itemList=items.map(it=>`${esc(it.item)} - ${esc(it.color)} - ${esc(it.size)} x ${it.qty}${it.design?' ('+esc(it.design)+')':''}`).join('<br>');
+    const price=items.reduce((a,it)=>a+(it.qty||0)*(it.price||0),0) || x.price || 0;
+    const cost=items.reduce((a,it)=>a+(it.qty||0)*(it.cost||0),0) || x.cost || 0;
+    return `<tr><td><b>${esc(x.number)}</b></td><td>${esc(x.customer)}<br><small>${esc(x.phone)} ${esc(x.email)}</small></td><td>${itemList}</td><td>${totalQty}</td><td><span class="pill">${esc(x.status)}</span></td><td>${esc(x.due)}</td><td>${money(price)}</td><td>${money(price-cost)}</td>
+    <td><div class="row-actions"><button onclick="editItem('orders','${x.id}')">Edit</button><button onclick="makeInvoiceFromOrder('${x.id}')">Invoice</button><button onclick="delItem('orders','${x.id}')">Delete</button></div></td></tr>`;
+  }).join('');
 }
 
 function makeInvoiceFromOrder(id){
   const o=db.orders.find(x=>x.id===id); if(!o)return;
   set('iNumber',o.number);set('iCustomer',o.customer);set('iContact',[o.email,o.phone].filter(Boolean).join(' / '));
-  db.invoice.lines=[{desc:`${o.item} - ${o.color} - ${o.size}`,qty:o.qty,price:(o.price||0)/(o.qty||1)}];
+  db.invoice.lines=orderItems(o).map(it=>({desc:it.item, color:it.color, size:it.size, qty:it.qty, price:it.price, design:it.design}));
   set('iNotes',o.notes);showTab('invoice');renderInvoice();
 }
 function addLineItem(){
   if(!db.invoice)db.invoice={lines:[]};
-  db.invoice.lines.push({desc:val('liDesc'),qty:num('liQty'),price:num('liPrice')});
-  ['liDesc','liPrice'].forEach(id=>set(id,''));set('liQty',1);save();renderInvoice();
+  db.invoice.lines.push({desc:val('liDesc'),color:val('liColor'),size:val('liSize'),qty:num('liQty'),price:num('liPrice')});
+  ['liDesc','liColor','liSize','liPrice'].forEach(id=>set(id,''));
+  set('liQty',1);save();renderInvoice();
 }
 function clearInvoice(){db.invoice={lines:[]};['iNumber','iCustomer','iContact','iNotes'].forEach(id=>set(id,''));renderInvoice();}
 function removeLine(i){db.invoice.lines.splice(i,1);save();renderInvoice();}
@@ -551,8 +712,8 @@ function renderInvoice(){
       <div><b>Invoice #:</b> ${esc(val('iNumber'))}<br><b>Date:</b> ${esc(val('iDate'))}<br><b>Type:</b> ${wholesale?'Wholesale':'Retail'}</div>
     </div>
     <p><b>Bill To:</b><br>${esc(val('iCustomer'))}<br>${esc(val('iContact'))}</p>
-    <table style="min-width:0"><thead><tr><th>Description</th><th>Qty</th><th>Unit</th><th>Total</th><th class="no-print"></th></tr></thead><tbody>
-    ${lines.map((l,i)=>`<tr><td>${esc(l.desc)}</td><td>${l.qty}</td><td>${money(l.price)}</td><td>${money((l.qty||0)*(l.price||0))}</td><td class="no-print"><button onclick="removeLine(${i})">Remove</button></td></tr>`).join('')}
+    <table style="min-width:0"><thead><tr><th>Description</th><th>Color</th><th>Size</th><th>Qty</th><th>Unit</th><th>Total</th><th class="no-print"></th></tr></thead><tbody>
+    ${lines.map((l,i)=>`<tr><td>${esc(l.desc)}${l.design?'<br><small>'+esc(l.design)+'</small>':''}</td><td>${esc(l.color)}</td><td>${esc(l.size)}</td><td>${l.qty}</td><td>${money(l.price)}</td><td>${money((l.qty||0)*(l.price||0))}</td><td class="no-print"><button onclick="removeLine(${i})">Remove</button></td></tr>`).join('')}
     </tbody></table>
     <div style="max-width:320px;margin-left:auto;margin-top:14px">
       <p><b>Subtotal:</b> ${money(subtotal)}</p>
@@ -564,13 +725,20 @@ function renderInvoice(){
 
 function renderLabels(){
   const sel=document.getElementById('labelOrder');
+  const current=sel.value;
   sel.innerHTML=db.orders.map(o=>`<option value="${o.id}">${esc(o.number)} - ${esc(o.customer)}</option>`).join('');
+  if(current)sel.value=current;
   const o=db.orders.find(x=>x.id===sel.value)||db.orders[0];
-  if(!o){document.getElementById('labelPreview').innerHTML='<p>No orders yet.</p>';return;}
-  const count=Math.max(1,Number(document.getElementById('labelCount').value)||o.qty||1);
-  const indiv=Array.from({length:count},(_,i)=>`<div class="label"><strong>${esc(o.customer)}</strong><br>Order: ${esc(o.number)}<br>${esc(o.item)}<br>Color: ${esc(o.color)}<br>Size: ${esc(o.size)}<br>Piece ${i+1} of ${count}</div>`).join('');
+  if(!o){document.getElementById('labelPreview').innerHTML='<p>No orders yet. Add one order, then labels will appear here.</p>';return;}
+  const items=orderItems(o);
+  const totalQty=items.reduce((a,it)=>a+(Number(it.qty)||0),0);
+  const count=Math.max(1,Number(document.getElementById('labelCount').value)||totalQty||1);
+  const expanded=[];
+  items.forEach(it=>{for(let i=0;i<(Number(it.qty)||1);i++)expanded.push(it);});
+  const indiv=expanded.slice(0,count).map((it,i)=>`<div class="label"><strong>${esc(o.customer)}</strong><br>Order: ${esc(o.number)}<br>${esc(it.item)}<br>Color: ${esc(it.color)}<br>Size: ${esc(it.size)}<br>${it.design?esc(it.design)+'<br>':''}Piece ${i+1}</div>`).join('');
+  const orderList=items.map(it=>`${esc(it.item)} - ${esc(it.color)} - ${esc(it.size)} x ${it.qty}${it.design?' - '+esc(it.design):''}`).join('<br>');
   document.getElementById('labelPreview').innerHTML=`
-    <div class="label" style="margin-bottom:14px"><strong>ORDER LABEL</strong><br><b>${esc(o.customer)}</b><br>Order: ${esc(o.number)}<br>${esc(o.item)}<br>Color: ${esc(o.color)} Size: ${esc(o.size)} Qty: ${o.qty}<br>Due: ${esc(o.due)}<br>Status: ${esc(o.status)}</div>
+    <div class="label" style="margin-bottom:14px"><strong>ORDER LABEL</strong><br><b>${esc(o.customer)}</b><br>Order: ${esc(o.number)}<br>${orderList}<br>Due: ${esc(o.due)}<br>Status: ${esc(o.status)}</div>
     <div class="label-sheet">${indiv}</div>`;
 }
 
@@ -582,8 +750,8 @@ function renderStats(){
   const ready=db.orders.filter(o=>o.status==='Ready to Press').length;
   const gVal=db.garments.reduce((a,x)=>a+(x.qty||0)*(x.cost||0),0);
   const dVal=db.dtf.reduce((a,x)=>a+(x.qty||0)*(x.cost||0),0);
-  const revenue=db.orders.reduce((a,x)=>a+(x.price||0),0);
-  const cost=db.orders.reduce((a,x)=>a+(x.cost||0),0);
+  const revenue=db.orders.reduce((a,x)=>a+(orderItems(x).reduce((b,it)=>b+(it.qty||0)*(it.price||0),0)||x.price||0),0);
+  const cost=db.orders.reduce((a,x)=>a+(orderItems(x).reduce((b,it)=>b+(it.qty||0)*(it.cost||0),0)||x.cost||0),0);
   document.getElementById('statGarments').textContent=garmentQty;
   document.getElementById('statDtf').textContent=dtfQty;
   document.getElementById('statHtv').textContent=htvYards.toFixed(1);
@@ -592,10 +760,19 @@ function renderStats(){
   document.getElementById('statRevenue').textContent=money(revenue);
   document.getElementById('statProfit').textContent=money(revenue-cost);
   document.getElementById('statReady').textContent=ready;
+  document.querySelectorAll('.stat').forEach((card,i)=>{
+    if(!card.querySelector('.progress')){
+      const p=document.createElement('div');p.className='progress';p.innerHTML='<i></i>';card.appendChild(p);
+    }
+    const bar=card.querySelector('.progress i');
+    const nums=[garmentQty,dtfQty,htvYards,open,gVal+dVal,revenue,Math.max(0,revenue-cost),ready];
+    const max=Math.max(1, ...nums.map(n=>Number(n)||0));
+    bar.style.width=Math.max(8,Math.min(100,((nums[i]||0)/max)*100))+'%';
+  });
   document.getElementById('repGarmentValue').textContent=money(gVal);
   document.getElementById('repDtfValue').textContent=money(dVal);
   document.getElementById('repHtvYards').textContent=htvYards.toFixed(1);
-  const counts={}; db.orders.forEach(o=>{counts[o.item]=(counts[o.item]||0)+(o.qty||0)});
+  const counts={}; db.orders.forEach(o=>orderItems(o).forEach(it=>{counts[it.item]=(counts[it.item]||0)+(it.qty||0)}));
   const best=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
   document.getElementById('repBest').textContent=best?best[0]:'-';
   const lows=[
@@ -603,7 +780,7 @@ function renderStats(){
     ...db.dtf.filter(x=>Number(x.qty)<=Number(x.reorder)).map(x=>`DTF: ${x.name} ${x.width}x${x.height} - Qty ${x.qty}`),
     ...db.htv.filter(x=>Number(x.yards)<=Number(x.reorder)).map(x=>`HTV: ${x.type} ${x.color} - ${x.yards} yd`)
   ];
-  const lowHtml=lows.length?'<ul>'+lows.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':'<p>No low stock alerts.</p>';
+  const lowHtml=lows.length?'<ul>'+lows.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':'<p>Nothing is low right now. That part is handled.</p>';
   document.getElementById('lowAlerts').innerHTML=lowHtml;
   document.getElementById('reportLow').innerHTML=lowHtml;
 }
@@ -626,7 +803,7 @@ function exportCSV(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rcd-inventory-export.csv';a.click();
 }
 function printSection(id){showTab(id);window.print();}
-function renderAll(){renderStats();renderGarments();renderDtf();renderHtv();renderOrders();renderInvoice();renderLabels();}
+function renderAll(){renderStats();renderGarments();renderDtf();renderHtv();renderOrders();renderInvoice();renderLabels();renderTempOrderItems();}
 renderAll();
 </script>
 </body>
