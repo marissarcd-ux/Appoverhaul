@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Redwood Coast Design Inventory Studio</title>
+<style>
+:root{
+  --bg:#fff7fb;
+  --bg2:#f4fbff;
+  --card:#ffffff;
+  --ink:#1f2933;
+  --muted:#697586;
+  --line:#eadde8;
+  --accent:#ff7cad;
+  --accent-dark:#d94d82;
+  --accent2:#7bdff2;
+  --accent3:#c3f584;
+  --gold:#ffe08a;
+  --danger:#c0392b;
+  --success:#277a46;
+  --shadow:0 12px 30px rgba(31,41,51,.10);
+  --radius:22px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at top left,#ffe6f1 0,#fff7fb 36%,transparent 37%),
+    linear-gradient(135deg,var(--bg),var(--bg2));
+  min-height:100vh;
+}
+header{
+  padding:26px 16px 20px;
+  background:linear-gradient(135deg,#ff7cad,#7bdff2);
+  color:white;
+  text-align:center;
+  position:sticky;
+  top:0;
+  z-index:20;
+  box-shadow:var(--shadow);
+}
+header h1{margin:0;font-size:28px;letter-spacing:.3px}
+header p{margin:7px 0 0;font-size:14px;opacity:.95}
+main{max-width:1320px;margin:auto;padding:18px}
+.nav{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding:12px 0 18px;
+  position:sticky;
+  top:104px;
+  background:linear-gradient(180deg,#fff7fb 75%,rgba(255,247,251,0));
+  z-index:15;
+}
+.nav button{
+  border:1px solid var(--line);
+  background:white;
+  color:var(--ink);
+  padding:11px 15px;
+  border-radius:999px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(31,41,51,.06);
+  white-space:nowrap;
+}
+.nav button.active{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:white;
+  border-color:transparent;
+}
+.section{display:none}
+.section.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.card{
+  background:rgba(255,255,255,.94);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:16px;
+}
+.stat{
+  min-height:110px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.stat span{color:var(--muted);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+.stat strong{font-size:34px;margin-top:6px}
+.stat small{color:var(--muted);margin-top:5px}
+h2{margin:8px 0 14px;font-size:24px}
+h3{margin:0 0 12px;font-size:18px}
+.form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+label{font-size:12px;font-weight:700;color:#475467}
+input,select,textarea{
+  width:100%;
+  padding:11px 12px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#fff;
+  font-size:14px;
+  color:var(--ink);
+}
+textarea{min-height:72px;resize:vertical}
+button.action{
+  border:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+  color:white;
+  font-weight:800;
+  border-radius:16px;
+  padding:12px 16px;
+  cursor:pointer;
+  box-shadow:0 8px 18px rgba(217,77,130,.2);
+}
+button.secondary{
+  background:white;
+  color:var(--ink);
+  border:1px solid var(--line);
+  box-shadow:none;
+}
+button.danger{
+  background:var(--danger);
+}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.table-wrap{overflow:auto;border-radius:18px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;background:white;min-width:900px}
+th,td{border-bottom:1px solid var(--line);padding:10px;text-align:left;font-size:13px;vertical-align:top}
+th{background:#fff0f7;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+tr:hover td{background:#fffafd}
+.pill{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:999px;
+  background:#eef9ff;
+  border:1px solid #d8f3fb;
+  font-size:12px;
+  font-weight:700;
+}
+.low{background:#fff3f0;border-color:#ffd4cc;color:#a83223}
+.good{background:#effff4;border-color:#c8f5d5;color:#206a3c}
+.row-actions{display:flex;gap:6px;flex-wrap:wrap}
+.row-actions button{
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:white;
+  padding:7px 9px;
+  cursor:pointer;
+  font-weight:700;
+}
+.size-grid{
+  display:grid;
+  grid-template-columns:repeat(9,minmax(64px,1fr));
+  gap:8px;
+}
+.size-box{
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:9px;
+  background:#fffafd;
+}
+.size-box strong{display:block;font-size:12px;margin-bottom:6px}
+.invoice-preview{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:20px;
+}
+.invoice-head{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  border-bottom:2px solid #ffd3e5;
+  padding-bottom:12px;
+  margin-bottom:14px;
+}
+.invoice-title{font-size:30px;font-weight:900;color:var(--accent-dark)}
+.print-only{display:none}
+.notice{
+  background:#fffbea;
+  border:1px solid #ffe7a3;
+  border-radius:16px;
+  padding:12px;
+  color:#7a5200;
+  margin:10px 0;
+}
+.searchbar{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:12px}
+@media(max-width:900px){
+  .grid,.form-grid{grid-template-columns:1fr 1fr}
+  .size-grid{grid-template-columns:repeat(3,1fr)}
+  header{position:relative}
+  .nav{top:0}
+}
+@media(max-width:560px){
+  main{padding:12px}
+  .grid,.form-grid{grid-template-columns:1fr}
+  .invoice-head{flex-direction:column}
+}
+@media print{
+  body{background:white}
+  header,.nav,.no-print,.toolbar,.form-card{display:none!important}
+  main{max-width:none;padding:0}
+  .section{display:block}
+  .section:not(.print-section){display:none!important}
+  .card{box-shadow:none;border:0}
+  .invoice-preview,.label-sheet{border:0}
+  .print-only{display:block}
+}
+.label-sheet{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+.label{
+  border:2px dashed #222;
+  border-radius:10px;
+  padding:12px;
+  min-height:120px;
+  background:white;
+}
+.label strong{font-size:18px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Redwood Coast Design Inventory Studio</h1>
+  <p>Inventory, orders, invoices, labels, reports, and backups</p>
+</header>
+
+<main>
+  <div class="nav no-print" id="nav"></div>
+
+  <section id="dashboard" class="section active">
+    <h2>Dashboard</h2>
+    <div class="grid">
+      <div class="card stat"><span>Garments on hand</span><strong id="statGarments">0</strong><small>Total pieces</small></div>
+      <div class="card stat"><span>DTF transfers</span><strong id="statDtf">0</strong><small>Total transfers</small></div>
+      <div class="card stat"><span>HTV yards</span><strong id="statHtv">0</strong><small>Remaining yards</small></div>
+      <div class="card stat"><span>Open orders</span><strong id="statOrders">0</strong><small>Not completed</small></div>
+    </div>
+    <div class="grid" style="margin-top:14px">
+      <div class="card stat"><span>Inventory value</span><strong id="statValue">$0</strong><small>Estimated cost value</small></div>
+      <div class="card stat"><span>Revenue</span><strong id="statRevenue">$0</strong><small>Order total</small></div>
+      <div class="card stat"><span>Profit</span><strong id="statProfit">$0</strong><small>Revenue minus cost</small></div>
+      <div class="card stat"><span>Ready to press</span><strong id="statReady">0</strong><small>Orders ready</small></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h3>Low Stock Alerts</h3>
+      <div id="lowAlerts"></div>
+    </div>
+    <div class="card no-print" style="margin-top:14px">
+      <h3>Backup & Data</h3>
+      <div class="toolbar">
+        <button class="action" onclick="backupData()">Download Backup</button>
+        <label class="action secondary" style="display:inline-block;cursor:pointer">Restore Backup<input type="file" accept=".json" style="display:none" onchange="restoreData(event)"></label>
+        <button class="action secondary" onclick="exportCSV()">Export CSV</button>
+        <button class="action danger" onclick="clearAll()">Clear All Data</button>
+      </div>
+      <div class="notice">Data saves in this device/browser. Use Download Backup often, especially before changing phones or clearing browser data.</div>
+    </div>
+  </section>
+
+  <section id="garments" class="section">
+    <h2>Garment Inventory</h2>
+    <div class="card form-card">
+      <h3>Add Garment Size Run</h3>
+      <div class="form-grid">
+        <div><label>Item Type</label><select id="gType"><option>T-Shirt</option><option>Hoodie</option><option>Crewneck</option><option>Polo</option><option>Tank</option><option>Hat</option><option>Other</option></select></div>
+        <div><label>Brand / Style</label><input id="gBrand" placeholder="Gildan, Bella, Jerzees"></div>
+        <div><label>Color</label><input id="gColor" placeholder="Ash, Black, Sand"></div>
+        <div><label>Supplier</label><input id="gSupplier"></div>
+        <div><label>Cost Each</label><input id="gCost" type="number" step="0.01"></div>
+        <div><label>Location</label><input id="gLocation" placeholder="Bin A"></div>
+        <div><label>Barcode / SKU</label><input id="gBarcode" placeholder="Scan or type"></div>
+        <div><label>Low Stock Alert</label><input id="gReorder" type="number" value="2"></div>
+      </div>
+      <div style="margin-top:12px"><label>Notes</label><textarea id="gNotes"></textarea></div>
+      <h3 style="margin-top:16px">Sizes</h3>
+      <div class="size-grid" id="sizeGrid"></div>
+      <div class="toolbar"><button class="action" onclick="addGarmentRun()">Add Size Run</button></div>
+    </div>
+    <div class="card">
+      <div class="searchbar"><input id="garmentSearch" placeholder="Search garments..." oninput="renderAll()"><button class="action secondary" onclick="printSection('garments')">Print</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Type</th><th>Brand/Style</th><th>Color</th><th>Size</th><th>Qty</th><th>Cost</th><th>Location</th><th>Barcode</th><th>Status</th><th>Actions</th></tr></thead><tbody id="garmentRows"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="dtf" class="section">
+    <h2>DTF Transfer Inventory</h2>
+    <div class="card form-card">
+      <h3>Add DTF Transfer</h3>
+      <div class="form-grid">
+        <div><label>Design Name</label><input id="dName"></div>
+        <div><label>Team / Customer</label><input id="dCustomer"></div>
+        <div><label>Width Inches</label><input id="dWidth" type="number" step="0.01"></div>
+        <div><label>Height Inches</label><input id="dHeight" type="number" step="0.01"></div>
+        <div><label>Placement / Style</label><select id="dPlace"><option>Full Front</option><option>Full Back</option><option>Small Chest</option><option>Whole Chest</option><option>Arm</option><option>Sleeve</option><option>Leg</option><option>Custom</option></select></div>
+        <div><label>Quantity</label><input id="dQty" type="number" value="1"></div>
+        <div><label>Cost Each</label><input id="dCost" type="number" step="0.01"></div>
+        <div><label>Location</label><input id="dLocation"></div>
+        <div><label>Low Stock Alert</label><input id="dReorder" type="number" value="1"></div>
+        <div><label>Barcode / SKU</label><input id="dBarcode"></div>
+      </div>
+      <div style="margin-top:12px"><label>Notes</label><textarea id="dNotes"></textarea></div>
+      <div class="toolbar"><button class="action" onclick="addDtf()">Add Transfer</button></div>
+    </div>
+    <div class="card">
+      <div class="searchbar"><input id="dtfSearch" placeholder="Search transfers..." oninput="renderAll()"><button class="action secondary" onclick="printSection('dtf')">Print</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Design</th><th>Customer</th><th>Size</th><th>Placement</th><th>Qty</th><th>Cost</th><th>Location</th><th>Barcode</th><th>Status</th><th>Actions</th></tr></thead><tbody id="dtfRows"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="htv" class="section">
+    <h2>HTV Inventory</h2>
+    <div class="card form-card">
+      <h3>Add HTV</h3>
+      <div class="form-grid">
+        <div><label>Type / Material</label><select id="hType"><option>Easyweed</option><option>Glitter</option><option>Puff</option><option>Stretch</option><option>Flock</option><option>Metallic</option><option>Printable</option><option>Other</option></select></div>
+        <div><label>Color</label><input id="hColor"></div>
+        <div><label>Width</label><input id="hWidth" placeholder="12 in, 15 in, 20 in"></div>
+        <div><label>Yards Remaining</label><input id="hYards" type="number" step="0.01"></div>
+        <div><label>Supplier</label><input id="hSupplier"></div>
+        <div><label>Location</label><input id="hLocation"></div>
+        <div><label>Low Yard Alert</label><input id="hReorder" type="number" step="0.01" value="1"></div>
+        <div><label>Barcode / SKU</label><input id="hBarcode"></div>
+      </div>
+      <div style="margin-top:12px"><label>Notes</label><textarea id="hNotes"></textarea></div>
+      <div class="toolbar"><button class="action" onclick="addHtv()">Add HTV</button></div>
+    </div>
+    <div class="card">
+      <div class="searchbar"><input id="htvSearch" placeholder="Search HTV..." oninput="renderAll()"><button class="action secondary" onclick="printSection('htv')">Print</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Type</th><th>Color</th><th>Width</th><th>Yards</th><th>Supplier</th><th>Location</th><th>Barcode</th><th>Status</th><th>Actions</th></tr></thead><tbody id="htvRows"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="orders" class="section">
+    <h2>Orders</h2>
+    <div class="card form-card">
+      <h3>Add Order</h3>
+      <div class="form-grid">
+        <div><label>Order Number</label><input id="oNumber"></div>
+        <div><label>Customer / Team</label><input id="oCustomer"></div>
+        <div><label>Phone</label><input id="oPhone"></div>
+        <div><label>Email</label><input id="oEmail"></div>
+        <div><label>Item / Job</label><input id="oItem" placeholder="Hoodie, team order, etc."></div>
+        <div><label>Color</label><input id="oColor"></div>
+        <div><label>Size</label><input id="oSize"></div>
+        <div><label>Quantity</label><input id="oQty" type="number" value="1"></div>
+        <div><label>Status</label><select id="oStatus"><option>Waiting for Garments</option><option>Waiting for Transfers</option><option>Waiting for HTV</option><option>Ready to Press</option><option>Pressed / Complete</option><option>Picked Up</option></select></div>
+        <div><label>Due Date</label><input id="oDue" type="date"></div>
+        <div><label>Price</label><input id="oPrice" type="number" step="0.01"></div>
+        <div><label>Cost</label><input id="oCost" type="number" step="0.01"></div>
+      </div>
+      <div style="margin-top:12px"><label>Notes / Artwork Info</label><textarea id="oNotes"></textarea></div>
+      <div class="toolbar"><button class="action" onclick="addOrder()">Add Order</button></div>
+    </div>
+    <div class="card">
+      <div class="searchbar"><input id="orderSearch" placeholder="Search orders..." oninput="renderAll()"><button class="action secondary" onclick="printSection('orders')">Print</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Order #</th><th>Customer</th><th>Item</th><th>Color</th><th>Size</th><th>Qty</th><th>Status</th><th>Due</th><th>Price</th><th>Profit</th><th>Actions</th></tr></thead><tbody id="orderRows"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="invoice" class="section">
+    <h2>Invoice</h2>
+    <div class="card form-card no-print">
+      <h3>Create Invoice</h3>
+      <div class="form-grid">
+        <div><label>Invoice Number</label><input id="iNumber"></div>
+        <div><label>Invoice Date</label><input id="iDate" type="date"></div>
+        <div><label>Customer</label><input id="iCustomer"></div>
+        <div><label>Email / Phone</label><input id="iContact"></div>
+        <div><label>Invoice Type</label><select id="iWholesale" onchange="renderInvoice()"><option value="retail">Retail - include tax</option><option value="wholesale">Wholesale - no sales tax</option></select></div>
+        <div><label>Sales Tax %</label><input id="iTax" type="number" step="0.01" value="8.75" oninput="renderInvoice()"></div>
+      </div>
+      <h3 style="margin-top:16px">Line Item</h3>
+      <div class="form-grid">
+        <div><label>Description</label><input id="liDesc"></div>
+        <div><label>Quantity</label><input id="liQty" type="number" value="1"></div>
+        <div><label>Unit Price</label><input id="liPrice" type="number" step="0.01"></div>
+        <div><label>&nbsp;</label><button class="action" onclick="addLineItem()">Add Line</button></div>
+      </div>
+      <div style="margin-top:12px"><label>Notes</label><textarea id="iNotes" oninput="renderInvoice()"></textarea></div>
+      <div class="toolbar">
+        <button class="action" onclick="window.print()">Print / Save PDF</button>
+        <button class="action secondary" onclick="clearInvoice()">Clear Invoice</button>
+      </div>
+    </div>
+    <div class="card print-section">
+      <div class="invoice-preview" id="invoicePreview"></div>
+    </div>
+  </section>
+
+  <section id="labels" class="section">
+    <h2>Labels</h2>
+    <div class="card form-card no-print">
+      <h3>Print Order Labels</h3>
+      <div class="form-grid">
+        <div><label>Select Order</label><select id="labelOrder" onchange="renderLabels()"></select></div>
+        <div><label>Individual Labels</label><input id="labelCount" type="number" value="1" onchange="renderLabels()"></div>
+        <div><label>&nbsp;</label><button class="action" onclick="window.print()">Print Labels</button></div>
+      </div>
+    </div>
+    <div class="card print-section">
+      <div id="labelPreview"></div>
+    </div>
+  </section>
+
+  <section id="reports" class="section">
+    <h2>Reports</h2>
+    <div class="grid">
+      <div class="card stat"><span>Garment Value</span><strong id="repGarmentValue">$0</strong></div>
+      <div class="card stat"><span>DTF Value</span><strong id="repDtfValue">$0</strong></div>
+      <div class="card stat"><span>HTV Yards</span><strong id="repHtvYards">0</strong></div>
+      <div class="card stat"><span>Best Seller</span><strong id="repBest">-</strong></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h3>Low Stock Report</h3>
+      <div id="reportLow"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const tabs=[
+  ['dashboard','Dashboard'],['garments','Garments'],['dtf','DTF Transfers'],['htv','HTV'],['orders','Orders'],['invoice','Invoice'],['labels','Labels'],['reports','Reports']
+];
+const sizes=['XS','S','M','L','XL','2XL','3XL','4XL','5XL'];
+let db=JSON.parse(localStorage.getItem('rcdStudio')||'{"garments":[],"dtf":[],"htv":[],"orders":[],"invoice":{"lines":[]}}');
+
+function save(){localStorage.setItem('rcdStudio',JSON.stringify(db));renderAll();}
+function money(n){return '$'+(Number(n)||0).toFixed(2);}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function val(id){return document.getElementById(id).value.trim();}
+function num(id){return Number(document.getElementById(id).value)||0;}
+function set(id,v){document.getElementById(id).value=v||'';}
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+
+document.getElementById('nav').innerHTML=tabs.map((t,i)=>`<button onclick="showTab('${t[0]}')" class="${i===0?'active':''}">${t[1]}</button>`).join('');
+document.getElementById('sizeGrid').innerHTML=sizes.map(s=>`<div class="size-box"><strong>${s}</strong><input id="size_${s}" type="number" min="0" placeholder="Qty"></div>`).join('');
+document.getElementById('iDate').valueAsDate=new Date();
+
+function showTab(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active','print-section'));
+  document.getElementById(id).classList.add('active');
+  if(['invoice','labels'].includes(id))document.getElementById(id).classList.add('print-section');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  [...document.querySelectorAll('.nav button')].find(b=>b.textContent===tabs.find(t=>t[0]===id)[1]).classList.add('active');
+  renderAll();
+}
+
+function addGarmentRun(){
+  let added=0;
+  sizes.forEach(s=>{
+    const q=Number(document.getElementById('size_'+s).value)||0;
+    if(q>0){
+      db.garments.push({id:uid(),type:val('gType'),brand:val('gBrand'),color:val('gColor'),size:s,qty:q,cost:num('gCost'),supplier:val('gSupplier'),location:val('gLocation'),barcode:val('gBarcode'),reorder:num('gReorder'),notes:val('gNotes')});
+      document.getElementById('size_'+s).value='';
+      added++;
+    }
+  });
+  if(!added) return alert('Enter a quantity for at least one size.');
+  ['gBrand','gColor','gSupplier','gCost','gLocation','gBarcode','gNotes'].forEach(id=>set(id,''));
+  save();
+}
+
+function addDtf(){
+  db.dtf.push({id:uid(),name:val('dName'),customer:val('dCustomer'),width:num('dWidth'),height:num('dHeight'),place:val('dPlace'),qty:num('dQty'),cost:num('dCost'),location:val('dLocation'),reorder:num('dReorder'),barcode:val('dBarcode'),notes:val('dNotes')});
+  ['dName','dCustomer','dWidth','dHeight','dQty','dCost','dLocation','dBarcode','dNotes'].forEach(id=>set(id,''));
+  set('dQty',1);set('dReorder',1);save();
+}
+function addHtv(){
+  db.htv.push({id:uid(),type:val('hType'),color:val('hColor'),width:val('hWidth'),yards:num('hYards'),supplier:val('hSupplier'),location:val('hLocation'),reorder:num('hReorder'),barcode:val('hBarcode'),notes:val('hNotes')});
+  ['hColor','hWidth','hYards','hSupplier','hLocation','hBarcode','hNotes'].forEach(id=>set(id,''));
+  set('hReorder',1);save();
+}
+function addOrder(){
+  db.orders.push({id:uid(),number:val('oNumber')||('RCD-'+(db.orders.length+1).toString().padStart(4,'0')),customer:val('oCustomer'),phone:val('oPhone'),email:val('oEmail'),item:val('oItem'),color:val('oColor'),size:val('oSize'),qty:num('oQty'),status:val('oStatus'),due:val('oDue'),price:num('oPrice'),cost:num('oCost'),notes:val('oNotes')});
+  ['oNumber','oCustomer','oPhone','oEmail','oItem','oColor','oSize','oDue','oPrice','oCost','oNotes'].forEach(id=>set(id,''));
+  set('oQty',1);save();
+}
+
+function dec(type,id,field='qty'){
+  const item=db[type].find(x=>x.id===id);
+  if(item && Number(item[field])>0){item[field]=Number(item[field])-1;save();}
+}
+function editItem(type,id){
+  const item=db[type].find(x=>x.id===id);
+  if(!item)return;
+  Object.keys(item).forEach(k=>{
+    if(k==='id')return;
+    const nv=prompt(`Edit ${k}`,item[k]);
+    if(nv!==null)item[k]=isNaN(Number(nv))||nv.trim()===''?nv:Number(nv);
+  });
+  save();
+}
+function delItem(type,id){
+  if(confirm('Delete this record?')){db[type]=db[type].filter(x=>x.id!==id);save();}
+}
+
+function rowStatus(q,r){return Number(q)<=Number(r)?'<span class="pill low">Low</span>':'<span class="pill good">Good</span>'}
+function match(item,q){return JSON.stringify(item).toLowerCase().includes((q||'').toLowerCase())}
+
+function renderGarments(){
+  const q=val('garmentSearch');
+  document.getElementById('garmentRows').innerHTML=db.garments.filter(x=>match(x,q)).map(x=>`
+    <tr><td>${esc(x.type)}</td><td>${esc(x.brand)}</td><td>${esc(x.color)}</td><td><b>${esc(x.size)}</b></td><td>${x.qty}</td><td>${money(x.cost)}</td><td>${esc(x.location)}</td><td>${esc(x.barcode)}</td><td>${rowStatus(x.qty,x.reorder)}</td>
+    <td><div class="row-actions"><button onclick="dec('garments','${x.id}')">-1</button><button onclick="editItem('garments','${x.id}')">Edit</button><button onclick="delItem('garments','${x.id}')">Delete</button></div></td></tr>`).join('');
+}
+function renderDtf(){
+  const q=val('dtfSearch');
+  document.getElementById('dtfRows').innerHTML=db.dtf.filter(x=>match(x,q)).map(x=>`
+    <tr><td>${esc(x.name)}</td><td>${esc(x.customer)}</td><td>${x.width} x ${x.height}</td><td>${esc(x.place)}</td><td>${x.qty}</td><td>${money(x.cost)}</td><td>${esc(x.location)}</td><td>${esc(x.barcode)}</td><td>${rowStatus(x.qty,x.reorder)}</td>
+    <td><div class="row-actions"><button onclick="dec('dtf','${x.id}')">-1</button><button onclick="editItem('dtf','${x.id}')">Edit</button><button onclick="delItem('dtf','${x.id}')">Delete</button></div></td></tr>`).join('');
+}
+function renderHtv(){
+  const q=val('htvSearch');
+  document.getElementById('htvRows').innerHTML=db.htv.filter(x=>match(x,q)).map(x=>`
+    <tr><td>${esc(x.type)}</td><td>${esc(x.color)}</td><td>${esc(x.width)}</td><td>${x.yards}</td><td>${esc(x.supplier)}</td><td>${esc(x.location)}</td><td>${esc(x.barcode)}</td><td>${rowStatus(x.yards,x.reorder)}</td>
+    <td><div class="row-actions"><button onclick="dec('htv','${x.id}','yards')">-1 yd</button><button onclick="editItem('htv','${x.id}')">Edit</button><button onclick="delItem('htv','${x.id}')">Delete</button></div></td></tr>`).join('');
+}
+function renderOrders(){
+  const q=val('orderSearch');
+  document.getElementById('orderRows').innerHTML=db.orders.filter(x=>match(x,q)).map(x=>`
+    <tr><td><b>${esc(x.number)}</b></td><td>${esc(x.customer)}<br><small>${esc(x.phone)} ${esc(x.email)}</small></td><td>${esc(x.item)}</td><td>${esc(x.color)}</td><td>${esc(x.size)}</td><td>${x.qty}</td><td><span class="pill">${esc(x.status)}</span></td><td>${esc(x.due)}</td><td>${money(x.price)}</td><td>${money((x.price||0)-(x.cost||0))}</td>
+    <td><div class="row-actions"><button onclick="editItem('orders','${x.id}')">Edit</button><button onclick="makeInvoiceFromOrder('${x.id}')">Invoice</button><button onclick="delItem('orders','${x.id}')">Delete</button></div></td></tr>`).join('');
+}
+
+function makeInvoiceFromOrder(id){
+  const o=db.orders.find(x=>x.id===id); if(!o)return;
+  set('iNumber',o.number);set('iCustomer',o.customer);set('iContact',[o.email,o.phone].filter(Boolean).join(' / '));
+  db.invoice.lines=[{desc:`${o.item} - ${o.color} - ${o.size}`,qty:o.qty,price:(o.price||0)/(o.qty||1)}];
+  set('iNotes',o.notes);showTab('invoice');renderInvoice();
+}
+function addLineItem(){
+  if(!db.invoice)db.invoice={lines:[]};
+  db.invoice.lines.push({desc:val('liDesc'),qty:num('liQty'),price:num('liPrice')});
+  ['liDesc','liPrice'].forEach(id=>set(id,''));set('liQty',1);save();renderInvoice();
+}
+function clearInvoice(){db.invoice={lines:[]};['iNumber','iCustomer','iContact','iNotes'].forEach(id=>set(id,''));renderInvoice();}
+function removeLine(i){db.invoice.lines.splice(i,1);save();renderInvoice();}
+function renderInvoice(){
+  const lines=(db.invoice&&db.invoice.lines)||[];
+  const subtotal=lines.reduce((a,l)=>a+(Number(l.qty)||0)*(Number(l.price)||0),0);
+  const wholesale=val('iWholesale')==='wholesale';
+  const tax=wholesale?0:subtotal*(num('iTax')/100);
+  const total=subtotal+tax;
+  document.getElementById('invoicePreview').innerHTML=`
+    <div class="invoice-head">
+      <div><div class="invoice-title">INVOICE</div><b>Redwood Coast Design</b><br><small>Custom apparel, transfers, and spirit wear</small></div>
+      <div><b>Invoice #:</b> ${esc(val('iNumber'))}<br><b>Date:</b> ${esc(val('iDate'))}<br><b>Type:</b> ${wholesale?'Wholesale':'Retail'}</div>
+    </div>
+    <p><b>Bill To:</b><br>${esc(val('iCustomer'))}<br>${esc(val('iContact'))}</p>
+    <table style="min-width:0"><thead><tr><th>Description</th><th>Qty</th><th>Unit</th><th>Total</th><th class="no-print"></th></tr></thead><tbody>
+    ${lines.map((l,i)=>`<tr><td>${esc(l.desc)}</td><td>${l.qty}</td><td>${money(l.price)}</td><td>${money((l.qty||0)*(l.price||0))}</td><td class="no-print"><button onclick="removeLine(${i})">Remove</button></td></tr>`).join('')}
+    </tbody></table>
+    <div style="max-width:320px;margin-left:auto;margin-top:14px">
+      <p><b>Subtotal:</b> ${money(subtotal)}</p>
+      <p><b>Sales Tax:</b> ${money(tax)} ${wholesale?'<small>(Wholesale)</small>':''}</p>
+      <h2>Total: ${money(total)}</h2>
+    </div>
+    <p><b>Notes:</b><br>${esc(val('iNotes'))}</p>`;
+}
+
+function renderLabels(){
+  const sel=document.getElementById('labelOrder');
+  sel.innerHTML=db.orders.map(o=>`<option value="${o.id}">${esc(o.number)} - ${esc(o.customer)}</option>`).join('');
+  const o=db.orders.find(x=>x.id===sel.value)||db.orders[0];
+  if(!o){document.getElementById('labelPreview').innerHTML='<p>No orders yet.</p>';return;}
+  const count=Math.max(1,Number(document.getElementById('labelCount').value)||o.qty||1);
+  const indiv=Array.from({length:count},(_,i)=>`<div class="label"><strong>${esc(o.customer)}</strong><br>Order: ${esc(o.number)}<br>${esc(o.item)}<br>Color: ${esc(o.color)}<br>Size: ${esc(o.size)}<br>Piece ${i+1} of ${count}</div>`).join('');
+  document.getElementById('labelPreview').innerHTML=`
+    <div class="label" style="margin-bottom:14px"><strong>ORDER LABEL</strong><br><b>${esc(o.customer)}</b><br>Order: ${esc(o.number)}<br>${esc(o.item)}<br>Color: ${esc(o.color)} Size: ${esc(o.size)} Qty: ${o.qty}<br>Due: ${esc(o.due)}<br>Status: ${esc(o.status)}</div>
+    <div class="label-sheet">${indiv}</div>`;
+}
+
+function renderStats(){
+  const garmentQty=db.garments.reduce((a,x)=>a+(Number(x.qty)||0),0);
+  const dtfQty=db.dtf.reduce((a,x)=>a+(Number(x.qty)||0),0);
+  const htvYards=db.htv.reduce((a,x)=>a+(Number(x.yards)||0),0);
+  const open=db.orders.filter(o=>!['Picked Up','Pressed / Complete'].includes(o.status)).length;
+  const ready=db.orders.filter(o=>o.status==='Ready to Press').length;
+  const gVal=db.garments.reduce((a,x)=>a+(x.qty||0)*(x.cost||0),0);
+  const dVal=db.dtf.reduce((a,x)=>a+(x.qty||0)*(x.cost||0),0);
+  const revenue=db.orders.reduce((a,x)=>a+(x.price||0),0);
+  const cost=db.orders.reduce((a,x)=>a+(x.cost||0),0);
+  document.getElementById('statGarments').textContent=garmentQty;
+  document.getElementById('statDtf').textContent=dtfQty;
+  document.getElementById('statHtv').textContent=htvYards.toFixed(1);
+  document.getElementById('statOrders').textContent=open;
+  document.getElementById('statValue').textContent=money(gVal+dVal);
+  document.getElementById('statRevenue').textContent=money(revenue);
+  document.getElementById('statProfit').textContent=money(revenue-cost);
+  document.getElementById('statReady').textContent=ready;
+  document.getElementById('repGarmentValue').textContent=money(gVal);
+  document.getElementById('repDtfValue').textContent=money(dVal);
+  document.getElementById('repHtvYards').textContent=htvYards.toFixed(1);
+  const counts={}; db.orders.forEach(o=>{counts[o.item]=(counts[o.item]||0)+(o.qty||0)});
+  const best=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('repBest').textContent=best?best[0]:'-';
+  const lows=[
+    ...db.garments.filter(x=>Number(x.qty)<=Number(x.reorder)).map(x=>`Garment: ${x.brand} ${x.color} ${x.size} - Qty ${x.qty}`),
+    ...db.dtf.filter(x=>Number(x.qty)<=Number(x.reorder)).map(x=>`DTF: ${x.name} ${x.width}x${x.height} - Qty ${x.qty}`),
+    ...db.htv.filter(x=>Number(x.yards)<=Number(x.reorder)).map(x=>`HTV: ${x.type} ${x.color} - ${x.yards} yd`)
+  ];
+  const lowHtml=lows.length?'<ul>'+lows.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':'<p>No low stock alerts.</p>';
+  document.getElementById('lowAlerts').innerHTML=lowHtml;
+  document.getElementById('reportLow').innerHTML=lowHtml;
+}
+
+function backupData(){
+  const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rcd-inventory-backup.json';a.click();
+}
+function restoreData(e){
+  const file=e.target.files[0]; if(!file)return;
+  const r=new FileReader();r.onload=()=>{db=JSON.parse(r.result);save();};r.readAsText(file);
+}
+function clearAll(){if(confirm('This deletes all saved app data on this device. Continue?')){db={garments:[],dtf:[],htv:[],orders:[],invoice:{lines:[]}};save();}}
+function exportCSV(){
+  const rows=[];
+  ['garments','dtf','htv','orders'].forEach(type=>db[type].forEach(x=>rows.push({type,...x})));
+  const keys=[...new Set(rows.flatMap(Object.keys))];
+  const csv=[keys.join(','),...rows.map(r=>keys.map(k=>`"${String(r[k]??'').replace(/"/g,'""')}"`).join(','))].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rcd-inventory-export.csv';a.click();
+}
+function printSection(id){showTab(id);window.print();}
+function renderAll(){renderStats();renderGarments();renderDtf();renderHtv();renderOrders();renderInvoice();renderLabels();}
+renderAll();
+</script>
+</body>
+</html>
